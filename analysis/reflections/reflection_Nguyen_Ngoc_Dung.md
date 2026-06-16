@@ -1,7 +1,7 @@
 # Individual Reflection — Nguyễn Ngọc Dũng (2A202600906)
 
 **Phụ trách:** Failure Analysis, QA & Submission Validation
-**Module chính:** `analysis/failure_analysis.md`, `check_lab.py`, bảo mật `.env` / `vertex-key.json`
+**Module chính:** `analysis/failure_analysis.md`, `check_lab.py`, `.gitignore`, `requirements.txt`, `reports/` (summary.json, benchmark_results.json), bảo mật `.env` / `vertex-key.json`
 
 ## 1. Engineering Contribution
 
