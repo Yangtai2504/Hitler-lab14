@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "version": "Agent_V2_Optimized",
+    "total": 60,
+    "pass_count": 51,
+    "fail_count": 9,
+    "timestamp": "2026-06-16 12:59:17"
+  },
+  "metrics": {
+    "avg_score": 4.4232,
+    "hit_rate": 1.0,
+    "mrr": 0.95,
+    "faithfulness": 0.525,
+    "relevancy": 0.8829,
+    "agreement_rate": 0.8568,
+    "pass_rate": 0.85,
+    "avg_latency": 0.0386,
+    "p95_latency": 0.048,
+    "total_tokens": 14000,
+    "avg_tokens_per_case": 233.33,
+    "total_cost_usd": 0.0021,
+    "avg_cost_per_case_usd": 3.5e-05,
+    "runtime_seconds": 0.2027,
+    "cases_per_second": 296.052
+  },
+  "baseline": {
+    "metadata": {
+      "version": "Agent_V1_Base",
+      "total": 60,
+      "pass_count": 40,
+      "fail_count": 20,
+      "timestamp": "2026-06-16 12:59:17"
+    },
+    "metrics": {
+      "avg_score": 3.8618,
+      "hit_rate": 0.9167,
+      "mrr": 0.8528,
+      "faithfulness": 0.5036,
+      "relevancy": 0.6963,
+      "agreement_rate": 0.839,
+      "pass_rate": 0.6667,
+      "avg_latency": 0.0712,
+      "p95_latency": 0.0798,
+      "total_tokens": 12312,
+      "avg_tokens_per_case": 205.2,
+      "total_cost_usd": 0.00344736,
+      "avg_cost_per_case_usd": 5.746e-05,
+      "runtime_seconds": 0.3641,
+      "cases_per_second": 164.8095
+    }
+  },
+  "regression": {
+    "avg_score_delta": 0.5614,
+    "hit_rate_delta": 0.0833,
+    "mrr_delta": 0.0972,
+    "cost_delta_usd": -0.00134736,
+    "cost_change_pct": -0.3908,
+    "p95_latency_delta": -0.0318
+  },
+  "release_gate": {
+    "decision": "Release",
+    "thresholds": {
+      "min_avg_score": 3.8,
+      "min_hit_rate": 0.85,
+      "min_agreement_rate": 0.65,
+      "max_score_regression": -0.05,
+      "max_hit_rate_regression": -0.05,
+      "max_cost_increase_pct": 0.15,
+      "max_p95_latency_seconds": 2.0
+    },
+    "deltas": {
+      "avg_score_delta": 0.5614,
+      "hit_rate_delta": 0.0833,
+      "mrr_delta": 0.0972,
+      "cost_delta_usd": -0.00134736,
+      "cost_change_pct": -0.3908,
+      "p95_latency_delta": -0.0318
+    },
+    "checks": {
+      "quality_floor": true,
+      "retrieval_floor": true,
+      "judge_reliability_floor": true,
+      "no_score_regression": true,
+      "no_retrieval_regression": true,
+      "cost_guardrail": true,
+      "latency_guardrail": true
+    },
+    "rationale": [
+      "All quality, retrieval, cost, and latency guardrails passed."
+    ]
+  },
+  "cost_optimization_plan": {
+    "target": "Giảm 30% chi phí eval mà không giảm độ chính xác",
+    "actions": [
+      "Cache kết quả judge theo hash(question, answer, ground_truth).",
+      "Dùng model routing: case dễ dùng flash, case conflict mới dùng pro.",
+      "Trim context theo top reranked chunks thay vì gửi toàn bộ context.",
+      "Chạy async batch có concurrency guard để giảm thời gian chờ."
+    ]
+  }
+}

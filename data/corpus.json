@@ -1,0 +1,107 @@
+[
+  {
+    "id": "retrieval_metrics",
+    "title": "Retrieval Evaluation",
+    "keywords": ["Hit Rate", "MRR", "retrieval", "Vector DB"],
+    "answer": "Retrieval evaluation phải tính Hit Rate và MRR trên expected_retrieval_ids để chứng minh Vector DB lấy đúng tài liệu trước khi chấm generation.",
+    "text": "Retrieval Evaluation đo chất lượng bước lấy tài liệu. Hit Rate kiểm tra ít nhất một ground truth document có nằm trong top-k hay không. MRR đo vị trí đầu tiên của tài liệu đúng theo reciprocal rank. Nếu retrieval fail, answer quality thường giảm và hallucination dễ xuất hiện."
+  },
+  {
+    "id": "golden_dataset_sdg",
+    "title": "Golden Dataset & SDG",
+    "keywords": ["Golden Dataset", "SDG", "red teaming", "50 cases"],
+    "answer": "Golden Dataset cần có ít nhất 50 test cases chất lượng, gồm expected_answer, expected_retrieval_ids và hard cases/red teaming để kiểm tra giới hạn hệ thống.",
+    "text": "Synthetic Data Generation tạo Golden Dataset cho benchmark. Dataset expert phải có hơn 50 case, ground truth IDs, câu hỏi dễ, câu hỏi khó, adversarial prompt, out-of-context, ambiguity, conflicting information và multi-turn complexity."
+  },
+  {
+    "id": "multi_judge_consensus",
+    "title": "Multi-Judge Consensus",
+    "keywords": ["multi judge", "consensus", "LLM judge", "2 model"],
+    "answer": "Multi-Judge Consensus cần dùng ít nhất 2 judge model, so sánh điểm từng model và tạo final_score khách quan hơn một judge đơn lẻ.",
+    "text": "Multi-Judge Consensus Engine tránh phụ thuộc vào một judge duy nhất. Hệ thống nên gọi ít nhất hai judge model, lưu individual_scores, tính final_score và ghi lại reasoning để minh bạch."
+  },
+  {
+    "id": "judge_calibration",
+    "title": "Judge Calibration",
+    "keywords": ["agreement rate", "calibration", "conflict", "Cohen Kappa"],
+    "answer": "Calibration phải tính Agreement Rate, phát hiện điểm lệch lớn giữa các judge và tự động xử lý conflict bằng rule hoặc judge hòa giải.",
+    "text": "Judge calibration đo độ tin cậy của các judge. Agreement Rate phản ánh mức đồng thuận. Với nhiều nhãn có thể dùng Cohen's Kappa. Nếu hai judge lệch hơn một ngưỡng, hệ thống cần conflict resolution."
+  },
+  {
+    "id": "async_runner",
+    "title": "Async Benchmark Runner",
+    "keywords": ["async", "concurrency", "latency", "batch"],
+    "answer": "Async runner chạy nhiều test case song song với giới hạn concurrency để giảm latency nhưng vẫn tránh rate limit khi gọi agent hoặc judge.",
+    "text": "Benchmark 50+ cases không nên chạy tuần tự. Async runner dùng asyncio, semaphore hoặc batch để chạy song song. Báo cáo nên có runtime, average latency, p95 latency và cases per second."
+  },
+  {
+    "id": "regression_gate",
+    "title": "Regression Release Gate",
+    "keywords": ["regression", "release gate", "rollback", "V1 V2"],
+    "answer": "Regression gate so sánh V1 và V2, tính delta chất lượng/chi phí/hiệu năng rồi tự động quyết định Release hoặc Rollback theo threshold.",
+    "text": "Regression Testing bảo vệ chất lượng khi agent thay đổi. Hệ thống so sánh baseline V1 với candidate V2. Nếu score giảm quá mức, hit rate giảm hoặc cost/latency vượt ngưỡng thì Auto-Gate phải rollback."
+  },
+  {
+    "id": "cost_token_report",
+    "title": "Cost & Token Report",
+    "keywords": ["cost", "token usage", "cost per eval", "30%"],
+    "answer": "Cost report cần ghi token usage, estimated cost per eval và đề xuất tối ưu như caching, model routing, prompt trimming hoặc batch async để giảm chi phí.",
+    "text": "Evaluation factory chuyên nghiệp phải đo chi phí. Mỗi case nên ghi tokens_used, estimated_cost_usd, model và latency. Nhóm cần đề xuất cách giảm 30% chi phí eval mà không giảm độ chính xác."
+  },
+  {
+    "id": "failure_clustering",
+    "title": "Failure Clustering",
+    "keywords": ["failure clustering", "hallucination", "incomplete", "tone mismatch"],
+    "answer": "Failure clustering nhóm các case fail theo loại lỗi như retrieval miss, hallucination, incomplete answer, tone mismatch, judge conflict hoặc latency.",
+    "text": "Sau benchmark, nhóm cần phân cụm lỗi để hiểu hệ thống hỏng ở đâu. Các nhóm thường gặp là hallucination, incomplete, tone mismatch, retrieval miss, safety failure và latency/cost regression."
+  },
+  {
+    "id": "five_whys",
+    "title": "5 Whys Root Cause",
+    "keywords": ["5 Whys", "root cause", "nguyên nhân gốc rễ"],
+    "answer": "5 Whys phải đi từ symptom đến root cause, chỉ rõ lỗi nằm ở ingestion, chunking, retrieval, prompting hoặc judge calibration.",
+    "text": "Phân tích 5 Whys không dừng ở kết luận LLM trả lời sai. Báo cáo cần truy ngược nguyên nhân: dữ liệu ingest thiếu, chunking làm loãng thông tin, retriever lấy sai, prompt không ràng buộc hoặc judge không ổn định."
+  },
+  {
+    "id": "prompt_injection_safety",
+    "title": "Prompt Injection & Scope Safety",
+    "keywords": ["prompt injection", "goal hijacking", "safety", "scope"],
+    "answer": "Agent phải chống prompt injection và goal hijacking bằng cách không bỏ qua context, không làm nhiệm vụ ngoài phạm vi và giữ đúng mục tiêu benchmark.",
+    "text": "Hard cases cần kiểm tra prompt injection và goal hijacking. Agent không được nghe yêu cầu bỏ qua policy, tiết lộ secret, thay đổi mục tiêu hoặc trả lời ngoài phạm vi tài liệu đánh giá."
+  },
+  {
+    "id": "out_of_context_policy",
+    "title": "Out-of-Context & Ambiguity Policy",
+    "keywords": ["out of context", "ambiguous", "clarify", "không biết"],
+    "answer": "Khi thiếu thông tin hoặc câu hỏi mơ hồ, agent phải nói không đủ dữ liệu hoặc hỏi lại thay vì bịa câu trả lời.",
+    "text": "Out-of-context questions kiểm tra hallucination. Nếu tài liệu không đề cập, agent cần nói không đủ thông tin. Với câu hỏi ambiguous, agent nên hỏi clarify trước khi trả lời."
+  },
+  {
+    "id": "position_bias",
+    "title": "Position Bias Check",
+    "keywords": ["position bias", "A/B", "judge bias", "swap"],
+    "answer": "Position bias được kiểm tra bằng cách đảo vị trí response A/B rồi so sánh điểm để xem judge có ưu ái câu đứng trước không.",
+    "text": "LLM judge có thể bị position bias khi luôn thích response A hơn response B. Cách kiểm tra là đổi chỗ hai câu trả lời, chạy lại judge và đo sự thay đổi điểm."
+  },
+  {
+    "id": "submission_pack",
+    "title": "Submission Package",
+    "keywords": ["submission", "reports", "reflection", ".env"],
+    "answer": "Gói nộp bài gồm source code, reports/summary.json, reports/benchmark_results.json, analysis/failure_analysis.md và analysis/reflections/reflection_[Ten_SV].md; không push .env.",
+    "text": "Nhóm nộp một repository chứa source code, reports generated từ main.py, group report failure_analysis.md và individual reflection files. File .env chứa API key không được push lên GitHub."
+  },
+  {
+    "id": "chunking_ingestion",
+    "title": "Ingestion & Chunking Strategy",
+    "keywords": ["ingestion", "chunking", "semantic chunking", "reranking"],
+    "answer": "Nếu lỗi đến từ context sai, nhóm cần xem lại ingestion, chunk size, semantic chunking, metadata và có thể thêm reranking.",
+    "text": "Nhiều hallucination bắt nguồn từ ingestion hoặc chunking. Chunk quá lớn làm loãng thông tin, chunk quá nhỏ mất ngữ cảnh. Metadata yếu khiến retriever khó tìm đúng nguồn. Reranking có thể cải thiện top-k."
+  },
+  {
+    "id": "ragas_generation_metrics",
+    "title": "Generation Metrics",
+    "keywords": ["RAGAS", "faithfulness", "relevancy", "answer quality"],
+    "answer": "Generation nên được đánh giá bằng faithfulness, relevancy và judge score để đo câu trả lời có đúng context, đúng câu hỏi và đúng ground truth không.",
+    "text": "Sau retrieval, generation cần được chấm riêng. Faithfulness đo câu trả lời có dựa trên context hay không. Relevancy đo mức liên quan đến câu hỏi. LLM judge score đo độ đúng so với ground truth."
+  }
+]

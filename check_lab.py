@@ -1,63 +1,95 @@
 import json
 import os
+import sys
+from pathlib import Path
 
-def validate_lab():
-    print("🔍 Đang kiểm tra định dạng bài nộp...")
+
+ROOT = Path(__file__).resolve().parent
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
+
+def validate_lab() -> None:
+    print("Đang kiểm tra định dạng bài nộp...")
 
     required_files = [
         "reports/summary.json",
         "reports/benchmark_results.json",
-        "analysis/failure_analysis.md"
+        "analysis/failure_analysis.md",
     ]
 
-    # 1. Kiểm tra sự tồn tại của tất cả file
     missing = []
-    for f in required_files:
-        if os.path.exists(f):
-            print(f"✅ Tìm thấy: {f}")
+    for file_path in required_files:
+        if (ROOT / file_path).exists():
+            print(f"Tìm thấy: {file_path}")
         else:
-            print(f"❌ Thiếu file: {f}")
-            missing.append(f)
+            print(f"Thiếu file: {file_path}")
+            missing.append(file_path)
 
     if missing:
-        print(f"\n❌ Thiếu {len(missing)} file. Hãy bổ sung trước khi nộp bài.")
+        print(f"\nThiếu {len(missing)} file. Hãy bổ sung trước khi nộp bài.")
         return
 
-    # 2. Kiểm tra nội dung summary.json
     try:
-        with open("reports/summary.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except json.JSONDecodeError as e:
-        print(f"❌ File reports/summary.json không phải JSON hợp lệ: {e}")
+        summary = json.loads((ROOT / "reports/summary.json").read_text(encoding="utf-8"))
+        benchmark_results = json.loads((ROOT / "reports/benchmark_results.json").read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"File JSON không hợp lệ: {exc}")
         return
 
-    if "metrics" not in data or "metadata" not in data:
-        print("❌ File summary.json thiếu trường 'metrics' hoặc 'metadata'.")
+    if "metrics" not in summary or "metadata" not in summary:
+        print("summary.json thiếu trường metrics hoặc metadata.")
         return
 
-    metrics = data["metrics"]
+    metrics = summary["metrics"]
+    expected_metric_keys = [
+        "avg_score",
+        "hit_rate",
+        "mrr",
+        "faithfulness",
+        "relevancy",
+        "agreement_rate",
+        "total_cost_usd",
+        "p95_latency",
+    ]
+    missing_metrics = [key for key in expected_metric_keys if key not in metrics]
+    if missing_metrics:
+        print(f"Thiếu metrics: {missing_metrics}")
+        return
 
-    print(f"\n--- Thống kê nhanh ---")
-    print(f"Tổng số cases: {data['metadata'].get('total', 'N/A')}")
-    print(f"Điểm trung bình: {metrics.get('avg_score', 0):.2f}")
+    if len(benchmark_results) < 50:
+        print(f"Golden benchmark cần 50+ cases, hiện có {len(benchmark_results)}.")
+        return
 
-    # EXPERT CHECKS
-    has_retrieval = "hit_rate" in metrics
-    if has_retrieval:
-        print(f"✅ Đã tìm thấy Retrieval Metrics (Hit Rate: {metrics['hit_rate']*100:.1f}%)")
+    has_release_gate = "release_gate" in summary and "decision" in summary["release_gate"]
+    reflection_dir = ROOT / "analysis" / "reflections"
+    reflection_files = list(reflection_dir.glob("reflection_*.md")) if reflection_dir.exists() else []
+
+    print("\n--- Thống kê nhanh ---")
+    print(f"Tổng số cases: {summary['metadata'].get('total', 'N/A')}")
+    print(f"Điểm trung bình: {metrics['avg_score']:.2f}")
+    print(f"Hit Rate: {metrics['hit_rate'] * 100:.1f}%")
+    print(f"MRR: {metrics['mrr']:.2f}")
+    print(f"Agreement Rate: {metrics['agreement_rate'] * 100:.1f}%")
+    print(f"Total Cost: ${metrics['total_cost_usd']}")
+    print(f"P95 Latency: {metrics['p95_latency']}s")
+
+    if has_release_gate:
+        print(f"Release Gate: {summary['release_gate']['decision']}")
     else:
-        print(f"⚠️ CẢNH BÁO: Thiếu Retrieval Metrics (hit_rate).")
+        print("CẢNH BÁO: Thiếu release_gate trong summary.json.")
 
-    has_multi_judge = "agreement_rate" in metrics
-    if has_multi_judge:
-        print(f"✅ Đã tìm thấy Multi-Judge Metrics (Agreement Rate: {metrics['agreement_rate']*100:.1f}%)")
+    if reflection_files:
+        print(f"Tìm thấy {len(reflection_files)} reflection cá nhân mẫu/thật.")
     else:
-        print(f"⚠️ CẢNH BÁO: Thiếu Multi-Judge Metrics (agreement_rate).")
+        print("CẢNH BÁO: Chưa có analysis/reflections/reflection_[Ten_SV].md.")
 
-    if data["metadata"].get("version"):
-        print(f"✅ Đã tìm thấy thông tin phiên bản Agent (Regression Mode)")
+    if os.path.exists(ROOT / ".env"):
+        print("Lưu ý: Có file .env cục bộ. Đảm bảo file này không được push lên GitHub.")
 
-    print("\n🚀 Bài lab đã sẵn sàng để chấm điểm!")
+    print("\nBài lab đã sẵn sàng để chấm điểm tự động.")
+
 
 if __name__ == "__main__":
     validate_lab()
