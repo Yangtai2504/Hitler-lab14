@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "version": "Agent_V2_Optimized",
+    "total": 60,
+    "timestamp": "2026-06-16 14:13:14",
+    "total_runtime_sec": 163.55,
+    "pipeline_runtime_sec": 321.81
+  },
+  "metrics": {
+    "avg_score": 4.358333333333333,
+    "pass_rate": 0.8666666666666667,
+    "hit_rate": 0.7708333333333334,
+    "mrr": 0.6927083333333334,
+    "agreement_rate": 0.925,
+    "conflict_resolved_count": 2,
+    "avg_latency_sec": 1.9886338266641057,
+    "total_cost_usd": 0.065528,
+    "avg_cost_per_case_usd": 0.001092
+  },
+  "regression": {
+    "baseline_version": "Agent_V1_Base",
+    "v1_metrics": {
+      "avg_score": 3.9833333333333334,
+      "pass_rate": 0.7833333333333333,
+      "hit_rate": 0.7708333333333334,
+      "mrr": 0.6666666666666666,
+      "agreement_rate": 0.9166666666666666,
+      "conflict_resolved_count": 2,
+      "avg_latency_sec": 3.205495111673372,
+      "total_cost_usd": 0.062312,
+      "avg_cost_per_case_usd": 0.001039
+    },
+    "gate": {
+      "decision": "APPROVE_RELEASE",
+      "delta_score": 0.375,
+      "hit_rate_ratio": 1.0,
+      "checks": {
+        "quality_ok": true,
+        "retrieval_ok": true,
+        "latency_ok": true
+      }
+    }
+  }
+}

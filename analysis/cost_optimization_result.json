@@ -1,0 +1,15 @@
+{
+  "n_cases": 60,
+  "full_multi_judge": {
+    "total_cost_usd": 0.049543,
+    "avg_score": 4.358
+  },
+  "cascade_judge": {
+    "total_cost_usd": 0.02272,
+    "avg_score": 4.383,
+    "escalated_to_pro_count": 13,
+    "escalated_pct": 21.7
+  },
+  "cost_reduction_pct": 54.1,
+  "avg_score_delta": 0.025
+}
